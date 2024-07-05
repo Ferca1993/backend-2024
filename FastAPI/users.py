@@ -1,8 +1,7 @@
 from typing import Union
 from fastapi import FastAPI
 from pydantic import BaseModel
-
-
+from enum import *
 app = FastAPI()
 
 
@@ -30,7 +29,7 @@ async def  usersjson():
     return {"name":"Ivan","surname": "Calvillo","url": "https://www.facebook.com/ivanfernando.calvillosanagustin/"}
 
 # json from a base model
-@app.get("/users_class") 
+@app.get("/users") 
 async def  users_class():
     return users_list
 
@@ -54,4 +53,39 @@ async def  user_id(id: int):
 async def  user_query(id: int, name: str):
     return search_user(id)
 
+# post request 
+# This action is to append new data
 
+@app.post("/user/")
+async def post_user(user: User):
+    if type(search_user(user.id)) == User:
+        return "Error: the user already exist "
+    else: 
+        users_list.append(user)
+        return user
+
+    
+# when you're import a module you must use the function, class etc in order to watch them visible in the currenct file
+ # Into a dictionary, it can't handle floats numbers, they must be integer for working well
+
+#put request is helpful updating data 
+#there are many way to update the data, it might be by whole user or by each data of user
+#When I make any change in my APP in FastAPI Always the server reset by itself
+
+@app.put("/user/")
+async def put_user(user: User):
+    found = False
+    for index, updated_user in enumerate(users_list):
+        if updated_user.id == user.id:
+            users_list[index] = user
+            found = True
+    
+    if not found:
+        return "Error, The user hadn't been updated" 
+    else:
+        return user
+
+
+
+@app.delete("/user/")
+async def delete_user(user: User):

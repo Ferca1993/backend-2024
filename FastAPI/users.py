@@ -1,5 +1,5 @@
 from typing import Union
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from enum import *
 app = FastAPI()
@@ -26,7 +26,8 @@ users_list = [User(id = 1 ,name = "Ivan",surname ="Calvillo",url = "https://www.
 # json manual
 @app.get("/usersjson") 
 async def  usersjson():
-    return {"name":"Ivan","surname": "Calvillo","url": "https://www.facebook.com/ivanfernando.calvillosanagustin/"}
+    return {"id": 3, "name":"Ivan","surname": "Calvillo","url": "https://www.facebook.com/ivanfernando.calvillosanagustin/","age": 31}
+
 
 # json from a base model
 @app.get("/users") 
@@ -56,15 +57,16 @@ async def  user_query(id: int, name: str):
 # post request 
 # This action is to append new data
 
-@app.post("/user/")
+@app.post("/user/",response_model=User,status_code=201) # The status code is a parameter to specifide a http code rightly (201 = Created The request succeeded, and a new resource was created as a result. This is typically the response sent after POST requests, or some PUT requests. ) 
+# The response model is helpful to return or as a return, getting back a outcome when the request has been made correctly.  
 async def post_user(user: User):
     if type(search_user(user.id)) == User:
-        return "Error: the user already exist "
+        raise HTTPException(status_code=204,detail="the user already exists") # The HTTPExeption is to make code inside of a functnion and showing a http code bases on a prompt, in addition, HTTPExeptions also can set up with own error in detail parameter
     else: 
         users_list.append(user)
         return user
 
-    
+
 # when you're import a module you must use the function, class etc in order to watch them visible in the currenct file
  # Into a dictionary, it can't handle floats numbers, they must be integer for working well
 
@@ -87,5 +89,25 @@ async def put_user(user: User):
 
 
 
-@app.delete("/user/")
-async def delete_user(user: User):
+@app.delete("/user/{id}") # Here We reuse "get path model" due to it contains the necessary logic to solve this issue.
+async def delete_user(id: int):
+    found = False
+
+    for index, updated_user in enumerate(users_list):
+        if updated_user.id == id:
+            #del users_list[index]
+            delete = users_list.pop(index) # my own contribution
+            found = True
+            return delete
+            
+    if not found:
+        return "Error, The user hadn't been deleted" 
+    
+# http status code 
+
+# Informational responses (100 – 199)
+# Successful responses (200 – 299)
+# Redirection messages (300 – 399)
+# Client error responses (400 – 499)
+# Server error responses (500 – 599)
+

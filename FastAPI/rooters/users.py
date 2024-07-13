@@ -1,14 +1,14 @@
 from typing import Union
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from enum import *
-app = FastAPI()
+router = APIRouter()
 
 
 #As from here, We're going to create an api for users by scratch
-## uvicorn users:app --reload for this file we must run it in this direction
+## uvicorn users:router --reload for this file we must run it in this direction
 
-#@app.get("/users") 
+#@router.get("/users") 
 #async def  users():
 #    return "Hi, Users"
 
@@ -24,13 +24,13 @@ class User(BaseModel): # base model is a tool which aids us out to build a class
 users_list = [User(id = 1 ,name = "Ivan",surname ="Calvillo",url = "https://www.facebook.com/ivanfernando.calvillosanagustin/,", age = 30),User(id = 2, name = "Fersh",surname ="San Agustin",url = "https://www.facebook.com/ivanfernando.calvillosanagustin/,", age = 31)] # It might be a database
 
 # json manual
-@app.get("/usersjson") 
+@router.get("/usersjson") 
 async def  usersjson():
     return {"id": 3, "name":"Ivan","surname": "Calvillo","url": "https://www.facebook.com/ivanfernando.calvillosanagustin/","age": 31}
 
 
 # json from a base model
-@app.get("/users") 
+@router.get("/users") 
 async def  users_class():
     return users_list
 
@@ -44,26 +44,26 @@ def search_user(id: int):
 
 
 # path model
-@app.get("/user/{id}") # In this fucntion is We can give parameters to it, I t means, This case We're gonna seeking out a user by its id
+@router.get("/user/{id}") # In this fucntion is We can give parameters to it, I t means, This case We're gonna seeking out a user by its id
 async def  user_id(id: int):
     return search_user(id)
     
 
 # query model
-@app.get("/user/") # "Calling a user by their ID means accessing them through bounded data."
+@router.get("/user/") # "Calling a user by their ID means accessing them through bounded data."
 async def  user_query(id: int, name: str):
     return search_user(id)
 
 # post request 
-# This action is to append new data
+# This action is to routerend new data
 
-@app.post("/user/",response_model=User,status_code=201) # The status code is a parameter to specifide a http code rightly (201 = Created The request succeeded, and a new resource was created as a result. This is typically the response sent after POST requests, or some PUT requests. ) 
+@router.post("/user/",response_model=User,status_code=201) # The status code is a parameter to specifide a http code rightly (201 = Created The request succeeded, and a new resource was created as a result. This is typically the response sent after POST requests, or some PUT requests. ) 
 # The response model is helpful to return or as a return, getting back a outcome when the request has been made correctly.  
 async def post_user(user: User):
     if type(search_user(user.id)) == User:
         raise HTTPException(status_code=204,detail="the user already exists") # The HTTPExeption is to make code inside of a functnion and showing a http code bases on a prompt, in addition, HTTPExeptions also can set up with own error in detail parameter
     else: 
-        users_list.append(user)
+        users_list.routerend(user)
         return user
 
 
@@ -72,9 +72,9 @@ async def post_user(user: User):
 
 #put request is helpful updating data 
 #there are many way to update the data, it might be by whole user or by each data of user
-#When I make any change in my APP in FastAPI Always the server reset by itself
+#When I make any change in my router in FastAPI Always the server reset by itself
 
-@app.put("/user/")
+@router.put("/user/")
 async def put_user(user: User):
     found = False
     for index, updated_user in enumerate(users_list):
@@ -89,7 +89,7 @@ async def put_user(user: User):
 
 
 
-@app.delete("/user/{id}") # Here We reuse "get path model" due to it contains the necessary logic to solve this issue.
+@router.delete("/user/{id}") # Here We reuse "get path model" due to it contains the necessary logic to solve this issue.
 async def delete_user(id: int):
     found = False
 

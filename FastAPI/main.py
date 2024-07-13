@@ -1,14 +1,26 @@
 #Firts off, For working with FastAPI we must create a virtual environment and import it
 
 from typing import Union
-
 from fastapi import FastAPI
+from rooters import products, users
+from fastapi.staticfiles import StaticFiles
+
+
+
 
 app = FastAPI()
  # upload the page
 # raw python
 # Hello FastAPI
 # To begin with, We're going to create a function so-called it "root" and it must be async in oder to work well
+
+#Routes 
+app.include_router(products.router) # router inclution coming from products
+app.include_router(users.router) # router inclution coming from products
+app.mount("/static",StaticFiles(directory="static"), name="static") # This is the way to manage static resources like documents, files, pdg, images ans son on, We must import the module "from fastapi.staticfiles import StaticFiles" in order for doing this possible
+
+
+
 @app.get("/") # get name "/"
 async def  root():
     return "Hi, FastApi"
@@ -22,3 +34,10 @@ async def  url():
 #highlight   http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc, which are useful to document your app from your browser 
 
 # There are many app to make test about the HTTP petitions coming from FastApi, We're going to use a extension coming from "VS code" so-called Thunder Client, Where We make all our requests
+
+
+
+
+
+
+

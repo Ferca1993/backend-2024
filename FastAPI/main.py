@@ -2,7 +2,7 @@
 
 from typing import Union
 from fastapi import FastAPI
-from rooters import products, users
+from routers import products, users, basic_auth_users, jwt_auth_users
 from fastapi.staticfiles import StaticFiles
 
 
@@ -17,6 +17,8 @@ app = FastAPI()
 #Routes 
 app.include_router(products.router) # router inclution coming from products
 app.include_router(users.router) # router inclution coming from products
+app.include_router(basic_auth_users.router) # router inclution coming from basic_auth_user
+app.include_router(jwt_auth_users.router) # router inclution coming from jwt_auth_user
 app.mount("/static",StaticFiles(directory="static"), name="static") # This is the way to manage static resources like documents, files, pdg, images ans son on, We must import the module "from fastapi.staticfiles import StaticFiles" in order for doing this possible
 
 

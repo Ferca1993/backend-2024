@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-app = FastAPI()
+router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login") # These modules are for authenticating the user. The first module handles both user and password data, and the second one defines how to send data and how our backend handles it.
 
@@ -57,7 +58,7 @@ async def current_user(token: str = Depends(oauth2_scheme)): # This function aut
     
     return user
 
-@app.post("/login")
+@router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user_db = users_db.get(form_data.username)
     if not user_db:
@@ -75,6 +76,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     
     return {"access_token": user.username, "token_type": "bearer"}
 
-@app.get("/user/me")
+@router.get("/user/me")
 async def read_users_me(current_user: User = Depends(current_user)): # This endpoint returns the current user information
     return current_user
